@@ -41,18 +41,16 @@ struct World {
     Health* health;
     byte* flags;
     uint32 capacity;
+
+    void deleteWorld();
+    Entity createEntity();
+    void deleteEntity(Entity entity);
+    Health* getHealth(Entity entity);
+    Position* getPosition(Entity entity);
+    void setPosition(Entity entity, Position position);
+    void setHealth(Entity entity, Health health);
+    void filter(byte mask, void callback(Entity));
 };
 
 World createWorld(uint32 capacity);
-void deleteWorld(World* world);
 
-Entity createEntity(World* world);
-void deleteEntity(World* world, Entity entity);
-
-Health* getHealth(World* world, Entity entity);
-Position* getPosition(World* world, Entity entity);
-
-void setPosition(World* world, Entity entity, Position position);
-void setHealth(World* world, Entity entity, Health health);
-
-void filter(World* world, byte mask, void callback(Entity));
