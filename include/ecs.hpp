@@ -42,6 +42,8 @@ struct World {
     byte* flags;
     uint32 capacity;
 
+    std::vector<Entity> freeEntities;
+
     void deleteWorld();
     Entity createEntity();
     void deleteEntity(Entity entity);

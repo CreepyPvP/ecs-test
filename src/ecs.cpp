@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <assert.h>
 #include <ecs.hpp>
+#include <numeric>
 
 World createWorld(uint32 capacity) {
     World world;
@@ -9,6 +10,8 @@ World createWorld(uint32 capacity) {
     world.health = (Health*) malloc(capacity * sizeof(Health));
     world.positions = (Position*) malloc(capacity * sizeof(Position));
     world.flags = (byte*) malloc(capacity * sizeof(byte));
+    world.freeEntities = std::vector<Entity>(capacity);
+    std::iota(world.freeEntities.begin(), world.freeEntities.end(), 0);
 
     for (int i = 0; i < capacity; ++i) {
         world.flags[i] = 0;
@@ -24,14 +27,11 @@ void World::deleteWorld() {
 }
 
 Entity World::createEntity() {
-    for (Entity i = 0; i < capacity; ++i) {
-        if ((flags[i] & IS_ACTIVE) == 0) {
-            flags[i] = IS_ACTIVE;
-            return i;
-        }
-    }
-
-    throw "Capacity exceeded";
+    assert(freeEntities.size() >= 1);
+    Entity lastEntity = freeEntities.back();
+    freeEntities.pop_back();
+    flags[lastEntity] = IS_ACTIVE;
+    return lastEntity;
 }
 
 Health* World::getHealth(Entity entity) {
@@ -56,6 +56,7 @@ void World::setPosition(Entity entity, Position position) {
 
 void World::deleteEntity(Entity entity) {
     flags[entity] = 0;
+    freeEntities.push_back(entity);
 }
 
 void World::filter(byte mask, void callback(Entity)) {
