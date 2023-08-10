@@ -1,18 +1,14 @@
-#include <cstdio>
-#include <cstdlib>
-#include <assert.h>
-#include <ecs.hpp>
 #include <numeric>
-#include <unordered_map>
+#include <ecs.hpp>
+#include <sparse_set.hpp>
 
-World createWorld(uint32 capacity) {
+World createWorld(uint16 capacity) {
     World world;
     world.capacity = capacity;
-    world.health = std::unordered_map<Entity, Health>();
-    world.positions = std::unordered_map<Entity, Position>();
     world.freeEntities = std::vector<Entity>(capacity);
     std::iota(world.freeEntities.begin(), world.freeEntities.end(), 0);
-
+    world.health = createSparseSet<Health>(1000, 2000);
+    world.positions = createSparseSet<Position>(1000, 2000);
     return world;
 }
 
@@ -28,35 +24,23 @@ Entity World::createEntity() {
 }
 
 Health* World::getHealth(Entity entity) {
-    return &(health.at(entity));
+    return health.get(entity);
 }
 
 Position* World::getPosition(Entity entity) {
-    return &(positions.at(entity));
+    return positions.get(entity);
 }
 
 void World::setHealth(Entity entity, Health health) {
-    this->health[entity] = health;
+    this->health.insert(entity, health);
 }
 
 void World::setPosition(Entity entity, Position position) {
-    positions[entity] = position;
+    positions.insert(entity, position);
 }
 
 void World::deleteEntity(Entity entity) {
-    health.erase(entity);
-    positions.erase(entity);
+    health.remove(entity);
+    positions.remove(entity);
     freeEntities.push_back(entity);
-}
-
-void World::filterPosition(void callback(Entity)) {
-    for (auto& entry : positions) {
-        callback(entry.first);
-    }
-}
-
-void World::filterHealth(void callback(Entity)) {
-    for (auto& entry : health) {
-        callback(entry.first);
-    }
 }

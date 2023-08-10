@@ -1,12 +1,7 @@
 #pragma once
 
-#include <cstdint>
-#include <unordered_map>
 #include <vector>
-
-#define uint16 uint16_t
-#define uint32 uint32_t
-#define byte unsigned char
+#include "sparse_set.hpp"
 
 static const byte IS_ACTIVE = 0b1;
 static const byte HEALTH = 0b10;
@@ -26,9 +21,10 @@ struct Health {
 };
 
 struct World {
-    std::unordered_map<Entity, Health> health;
-    std::unordered_map<Entity, Position> positions;
     uint32 capacity;
+
+    SparseSet<Health> health;
+    SparseSet<Position> positions;
 
     std::vector<Entity> freeEntities;
 
@@ -39,9 +35,7 @@ struct World {
     Position* getPosition(Entity entity);
     void setPosition(Entity entity, Position position);
     void setHealth(Entity entity, Health health);
-    void filterPosition(void callback(Entity));
-    void filterHealth(void callback(Entity));
 };
 
-World createWorld(uint32 capacity);
+World createWorld(uint16 capacity);
 
