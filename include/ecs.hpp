@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 
 #define uint16 uint16_t
@@ -10,18 +11,6 @@
 static const byte IS_ACTIVE = 0b1;
 static const byte HEALTH = 0b10;
 static const byte POSITION = 0b100;
-
-// struct Archtype {
-//     uint32 componentFlags; 
-//     uint16 capacity;
-//     byte* components;
-// };
-//
-// struct Entity {
-//     uint16 index;
-//     uint16 generation;
-//     uint16 archtype;
-// };
 
 
 typedef uint16 Entity;
@@ -37,9 +26,8 @@ struct Health {
 };
 
 struct World {
-    Position* positions;
-    Health* health;
-    byte* flags;
+    std::unordered_map<Entity, Health> health;
+    std::unordered_map<Entity, Position> positions;
     uint32 capacity;
 
     std::vector<Entity> freeEntities;
@@ -51,7 +39,8 @@ struct World {
     Position* getPosition(Entity entity);
     void setPosition(Entity entity, Position position);
     void setHealth(Entity entity, Health health);
-    void filter(byte mask, void callback(Entity));
+    void filterPosition(void callback(Entity));
+    void filterHealth(void callback(Entity));
 };
 
 World createWorld(uint32 capacity);

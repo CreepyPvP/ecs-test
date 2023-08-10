@@ -1,6 +1,8 @@
 #include <stdio.h>
-
 #include <ecs.hpp>
+
+
+#ifndef USE_ENTT
 
 static World myWorld;
 
@@ -36,10 +38,15 @@ void updateHealthSystem(Entity e) {
 }
 
 int main() {
-    myWorld = createWorld(1000);
+    myWorld = createWorld(2000);
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 2000; ++i) {
         Entity entity = myWorld.createEntity();
+        
+        if (i % 2) {
+            continue;
+        }
+
         Health health = {
             .hp = 10
         };
@@ -54,7 +61,16 @@ int main() {
     }
 
     for (int i = 0; i < 1000000; ++i) {
-        myWorld.filter(POSITION, updatePositionSystem);
-        myWorld.filter(POSITION | HEALTH, updateHealthSystem);
+        myWorld.filterPosition(updatePositionSystem);
+        myWorld.filterHealth(updateHealthSystem);
     }
 }
+#endif
+
+#ifdef USE_ENTT
+
+int main() {
+
+}
+
+#endif
